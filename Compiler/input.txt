@@ -1,0 +1,126 @@
+		j Main
+		j Interrupt
+		j Exception
+Main:	lui $t0, 0x0000
+		addi $t0, $zero, 24
+		jr $t0
+		add $s2, $zero, $zero
+		lui $t1, 0x4000 # $t1 = 0x40000000
+		addi $t0, $zero, -1000
+		sw $zero, 8($t1) # close TCON = 0
+		sw $t0, 0($t1) # initial TH
+		addi $t0, $zero, -1
+		sw $t0, 4($t1) # initial TL
+		addi $t0, $zero, 3
+		sw $t0, 8($t1) # initial TCON = 3
+wait:   lw $t2, 32($t1)
+        andi $t3, $t2, 8
+        beq $t3, $zero, wait
+        lw $s0, 28($t1)
+wait2:  lw $t2, 32($t1)
+        andi $t3, $t2, 8
+        beq $t3, $zero, wait2
+        lw $s1, 28($t1)
+		# addi $s0, $zero, 12
+		# addi $s1, $zero, 11
+		add $a0, $s0, $zero
+		add $a1, $s1, $zero
+loop:   beq $a0, $a1, exit           # a0 == a1
+		blt $a0, $a1, swap           # a0 < a1
+loop2:	sub $a0, $a0, $a1            # a0 > a1
+		j loop
+swap:	add $t0, $a0, $zero
+		add $a0, $a1, $zero
+		add $a1, $t0, $zero
+		j loop2
+exit:   add $v0, $a0, $zero
+		lui $t1, 0x4000
+		sw $v0, 24($t1)
+wait3:  lw $t2, 32($t1) # Á≠âÂæÖÂèëÈ?ÅÂÆåÊØ?
+        andi $t3, $t2, 16 
+        beq $t3, $zero, wait3
+	    j wait
+Interrupt: 	lui $t5, 0x4000 
+		sw $zero, 8($t5)
+		addi $t7, $zero, 64
+		sw $t7, 0($zero)
+		addi $t7, $zero, 121
+		sw $t7, 4($zero)
+		addi $t7, $zero, 36
+		sw $t7, 8($zero)
+		addi $t7, $zero, 48
+		sw $t7, 12($zero)
+		addi $t7, $zero, 25
+		sw $t7, 16($zero)
+		addi $t7, $zero, 18
+		sw $t7, 20($zero)
+		addi $t7, $zero, 2
+		sw $t7, 24($zero)
+		addi $t7, $zero, 120
+		sw $t7, 28($zero)
+		addi $t7, $zero, 0
+		sw $t7, 32($zero)
+		addi $t7, $zero, 16
+		sw $t7, 36($zero)
+		addi $t7, $zero, 8
+		sw $t7, 40($zero)
+		addi $t7, $zero, 3
+		sw $t7, 44($zero)
+		addi $t7, $zero, 70
+		sw $t7, 48($zero)
+		addi $t7, $zero, 33
+		sw $t7, 52($zero)
+		addi $t7, $zero, 6
+		sw $t7, 56($zero)
+		addi $t7, $zero, 14
+		sw $t7, 60($zero)
+		addi $t8, $zero, 0
+		beq $s2, $t8, Interrupt_0
+		addi $t8, $zero, 1
+		beq $s2, $t8, Interrupt_1
+		addi $t8, $zero, 2
+		beq $s2, $t8, Interrupt_2
+		addi $t8, $zero, 3
+		beq $s2, $t8, Interrupt_3
+Interrupt_0:
+		addi $s2, $s2, 1
+		sll $t4, $s0, 28
+		srl $t4, $t4, 28
+		sll $t4, $t4, 2
+		lw $t6, 0($t4)
+		addi $t6, $t6, 256
+		j JumpBack
+Interrupt_1:
+		addi $s2, $s2, 1
+		sll $t4, $s0, 24
+		srl $t4, $t4, 28
+		sll $t4, $t4, 2
+		lw $t6, 0($t4)
+		addi $t6, $t6, 512
+		j JumpBack
+Interrupt_2:
+		addi $s2, $s2, 1		
+		sll $t4, $s1, 28
+		srl $t4, $t4, 28
+		sll $t4, $t4, 2
+		lw $t6, 0($t4)
+		addi $t6, $t6, 1024
+		j JumpBack
+Interrupt_3:
+		add $s2, $zero, $zero
+		sll $t4, $s1, 24
+		srl $t4, $t4, 28
+		sll $t4, $t4, 2
+		lw $t6, 0($t4)
+		addi $t6, $t6, 2048
+JumpBack:	
+		sw $t6 ,20($t5)
+		sw $v0, 12($t5)
+		addi $t6, $zero, 3
+		sw $t6, 8($t5)
+		addi $26, $26, -4
+		jr $26
+Exception: 	sll $0, $0, 0
+		addi $26, $26, -4
+		jr $26
+
